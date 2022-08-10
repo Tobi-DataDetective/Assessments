@@ -1,0 +1,41 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+
+%matplotlib inline
+warnings.filterwarnings('ignore')
+
+from io import StringIO
+
+def solution(a = str()):
+    stringData = StringIO("""time,phone
+    {}""".format(a), newline='\n')
+
+    time_phone = pd.read_csv(stringData, sep=",")
+    time_phone[['h','m','s']] = time_phone['time'].str.split(':', expand=True)
+    time_phone = time_phone.astype({'h':'int','m':'int','s':'int'})
+    
+    condition = [
+        (time_phone.m<5),
+        time_phone.m>=5
+    ]
+    values = [((time_phone.m*60)+time_phone.s)*3,(time_phone.m+time_phone.s)*150]
+    
+    time_phone['cost'] = np.select(condition,values)
+    
+    time_phone.drop(columns=['h','m','s'], inplace=True)
+    
+    df = time_phone.groupby('phone')['cost'].agg(['sum','count']).reset_index().rename(columns={'sum':'cost'}).sort_values(by=['count'], ascending=False)
+
+    df.replace({df.iloc[0]['cost']:'free'}, inplace=True)
+    return(df)
+    
+    return(time_phone)
+
+
+# Running the function
+solution("""00:01:07,400-234-090
+00:05:01,701-080-080
+00:05:00,400-234-090""")

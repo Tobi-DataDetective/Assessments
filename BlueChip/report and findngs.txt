@@ -1,0 +1,166 @@
+I have also tried answering this question with a markdown in the html and jupyter notebook file to aid easy following of the steps
+
+
+Task 2: Competitor Dataset
+I have also tried answering this question reference with a markdown in the html and jupyter notebook file
+
+#####################################################
+Question 1: Which keywords are the lowest hanging fruits for toptal to go after?  
+From the table below we have '$25 credit repair','online translator english to spanish','online translator english to persian' etc as the lowest hanging fruits for toptal to go after.
+
+code: 
+comp_dataset.groupby('Keyword').min().reset_index().sort_values('Toptal.com', ascending=True)[['Keyword','Toptal.com']]
+
+Visual: Question12
+
+##########################################################
+
+
+Question 2: Which word pattern seems to be most prevalent from the list?
+From the trigram table above we can see that the 'work from home' pattern is the most prevailent from the list
+
+code:
+def trigram_top_n_words(x, n):
+    vec = CountVectorizer(ngram_range=(3,3)).fit(x)
+    bow = vec.transform(x)
+    sum_words = bow.sum(axis = 0)
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+    words_freq = sorted(words_freq, key = lambda x: x[1], reverse = True)
+    return words_freq[:n]
+
+words = trigram_top_n_words(keywords['Keyword'], 20) # taking top 100 words
+word_df3 = pd.DataFrame(words, columns=['Trigram','Frequency'])
+word_df3
+
+word_df3.to_csv('Trigam',index=False)
+
+word_df3 = word_df3.set_index('Trigram')
+
+word_df3.iplot(kind= 'bar', title ='Trigram Top 100')
+
+Visuals: newplot(2).png
+
+##########################################################333
+Question 4: Which keywords are the most competitve across 2 or more of the competitors?
+From the table below 'toptal support' seems to be the most used followed by the 'php developer work description'
+
+Visual: Question42
+
+###################################################33333
+Question 6: What were the most common themes you could find in the keyword data?
+From the visual above we can easy see the most common themes judging for how big the words are.
+Words like Job, home, work, freelance, online, data entry, india where some of the few most common themes used.
+
+code: 
+word_df3.to_csv('Trigam',index=False)
+
+word_df3 = word_df3.set_index('Trigram')
+
+word_df3.iplot(kind= 'bar', title ='Trigram Top 100')
+
+viusals: wordcloud.jpg
+
+
+##############################################
+
+Question 5:
+Are there any localized or geographically based keyword patterns that were represented
+
+Yes, Judging from the same word cloud we see the country 'india'
+
+
+###################################################
+Question 9: What was the most common phrase length for queries in the set?
+The most common query based on the number of lenght of the query is found to be 'a canadian software company that specializes in developing computer games'
+
+code: keywords.review_len.value_counts()
+	keywords[keywords.review_len==24]
+
+Visual: Question92
+
+
+############################################################
+Task 1: Skill Dataset
+
+#####################
+
+Question1: What are the most lucrative verticals?
+The most lucrative vertical is Development based on how high its 'Primary skill CPC/USD' is compared to others
+
+Code: 
+df_vertics.groupby('Vertical_Category').max().reset_index().sort_values('Primary_Skill_CPC_USD', ascending=False)
+
+Visual: question1.csv
+
+
+##########################
+
+Question2: What primary and Secondary skills seem to be the lowest hanging fruit and why?
+From the table derived below 'Ruby on Rails Developers', 'AngularJS Developers', 'Offshore Developers', 'PHP Developers', 'Laravel Developers' are the top 5 lowest hanging fruits based on their Primary Skill CPC/USD 
+
+code: 
+df_vertics.groupby('Primary_Skill').min().reset_index().sort_values('Primary_Skill_CPC_USD', ascending=False).head(20)
+
+Visual : Question2
+
+
+#########################################
+Question 3: What are the most commonly related skills to primary skills by verticals?
+
+step 1: I first did a cross tabluation of related skills vs primary skills pivoting it around the vertical category column and decided to flatten it to a regular dataframe
+
+Step 2: Ordering the table based on the column No_of_time_occuring_together in a descending order to find out the once with maximum counts
+
+Step 3: After finding out that the related skills had maximum counts of 4 (i.e this two skills were placed together 4 times) an issue arrived, which had to do with the Related Skill column. I had a lot of 'Not Identified Skills' (a value used to replace null values), so therefore using the frame with 'Not_Identified' value and score of 4 was biased and meaningless
+
+Step 4: I filtered out all the 'Not identified skill' value from the frame and ended up with a frame of max value 2. which would be more meaningfull to answering the question
+    
+Answer:  The most commonly related skills to primary skills by verticals can be seen in the 'most_common_related_primary_skill' table. Some of this skills are
+FinTech			SME financing
+React Native Developers	Android Developers
+HTML5 Developers	Web Designers
+HTML5 Developers	WordPress Developers
+React Native Developers	Flutter Developers
+and others.
+
+Code:
+pd.get_option("display.max_columns", None)
+top_Primary_Related_Skill = pd.DataFrame(pd.crosstab(df.Vertical_Category,[df.Primary_Skill,df.Related_Skill])
+                                         .sum().sort_values(ascending=False).reset_index())
+top_Primary_Related_Skill.columns = ['Primary_Skill', 'Relation_Skill', 'No_of_time_occuring_together']
+
+
+df.groupby(['Vertical_Category','Primary_Skill','Related_Skill']).count().reset_index().sort_values('Competitor_ID', ascending=False)
+
+
+top_Primary_Related_Skill
+
+without_not_identied=top_Primary_Related_Skill[top_Primary_Related_Skill.Relation_Skill !='Not Identified']
+# filter_not_identified = _4th[_4th.Relation_Skill !='Not Identified']
+
+# filter_not_identified
+most_common_related_primary_skill = without_not_identied[without_not_identied.No_of_time_occuring_together==2]
+
+most_common_related_primary_skill
+
+
+Visuals: Question 3
+
+
+
+
+####################################################
+Question4: How might you go about determining which related skills are strongest to the primary skills?
+.....
+Code: top_activities = df.groupby(by=['Primary_Skill', 'Related_Skill'])['#_of_Jobs'].sum().sort_values(ascending=True).head(10).reset_index()
+
+top_activities[top_activities.Related_Skill !='Not Identified']
+
+Visual: Question 4 redo
+
+
+question
+code
+graphs
+findings
+why or reasons
